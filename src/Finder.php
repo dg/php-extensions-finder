@@ -9,6 +9,7 @@ class Finder
 	/** @var array */
 	private $list;
 
+
 	/**
 	 * @return void
 	 */
@@ -55,19 +56,18 @@ class Finder
 
 		foreach ($tokens as $i => $token) {
 			if ($token === '('
-				&& $tokens[$i-1][0] === T_STRING
-				&& $tokens[$i-2][0] !== T_DOUBLE_COLON
-				&& $tokens[$i-2][0] !== T_OBJECT_OPERATOR
-				&& $tokens[$i-2][0] !== T_FUNCTION
-				&& $tokens[$i-2][0] !== T_NEW
-				&& $tokens[$i-2][0] !== T_NS_SEPARATOR
-				&& $tokens[$i-2] !== '&'
-				&& function_exists($func = $tokens[$i-1][1])
+				&& $tokens[$i - 1][0] === T_STRING
+				&& $tokens[$i - 2][0] !== T_DOUBLE_COLON
+				&& $tokens[$i - 2][0] !== T_OBJECT_OPERATOR
+				&& $tokens[$i - 2][0] !== T_FUNCTION
+				&& $tokens[$i - 2][0] !== T_NEW
+				&& $tokens[$i - 2][0] !== T_NS_SEPARATOR
+				&& $tokens[$i - 2] !== '&'
+				&& function_exists($func = $tokens[$i - 1][1])
 			) {
 				$extName = (new \ReflectionFunction($func))->getExtensionName();
-				$this->list[$extName][$func][$file][] = $tokens[$i-1][2];
+				$this->list[$extName][$func][$file][] = $tokens[$i - 1][2];
 			}
 		}
 	}
-
 }

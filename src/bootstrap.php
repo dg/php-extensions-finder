@@ -5,13 +5,13 @@ require is_file(__DIR__ . '/../vendor/autoload.php')
 	: __DIR__ . '/../../../autoload.php';
 
 
-set_exception_handler(function($e) {
+set_exception_handler(function ($e) {
 	echo "ERROR: {$e->getMessage()}\n";
 	exit(1);
 });
 
 
-$cmd = new Nette\CommandLine\Parser(<<<XX
+$cmd = new Nette\CommandLine\Parser(<<<'XX'
 Usage:
 	php php-extensions-finder [<path>]
 
