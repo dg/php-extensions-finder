@@ -12,7 +12,7 @@
 	"require": {
 		"php": ">=5.4.0",
 		"nette/command-line": "~1.0",
-		"nette/finder": "^2.4"
+		"nette/finder": "^2.3"
 	},
 	"autoload": {
 		"classmap": ["src/"]

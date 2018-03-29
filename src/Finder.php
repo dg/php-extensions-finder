@@ -64,8 +64,8 @@ class Finder
 				&& $tokens[$i - 2][0] !== T_NS_SEPARATOR
 				&& $tokens[$i - 2] !== '&'
 				&& function_exists($func = $tokens[$i - 1][1])
+				&& ($extName = (new \ReflectionFunction($func))->getExtensionName())
 			) {
-				$extName = (new \ReflectionFunction($func))->getExtensionName();
 				$this->list[$extName][$func][$file][] = $tokens[$i - 1][2];
 			}
 		}

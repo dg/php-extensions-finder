@@ -25,5 +25,5 @@ if ($cmd->isEmpty()) {
 	$cmd->help();
 }
 
-$cleaner = new DG\PhpExtensionsFinder\Finder($options['--test']);
-$cleaner->go($options['path']);
+$finder = new DG\PhpExtensionsFinder\Finder;
+$finder->go($options['path']);
