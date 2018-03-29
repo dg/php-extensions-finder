@@ -15,6 +15,18 @@ Usage:
 php php-extensions-finder [<path>]
 ```
 
+Or install globally via:
+```
+composer global require dg/php-extensions-finder
+```
+
+And use via:
+```
+php-extensions-finder [<path>]
+```
+Make sure your global vendor binaries directory is in your `$PATH` environment variable. (https://getcomposer.org/doc/03-cli.md#global)
+
+
 It generates result like:
 
 ```
