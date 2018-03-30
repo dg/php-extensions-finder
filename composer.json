@@ -12,7 +12,8 @@
 	"require": {
 		"php": ">=5.4.0",
 		"nette/command-line": "~1.0",
-		"nette/finder": "^2.3"
+		"nette/finder": "^2.3",
+		"nikic/php-parser": "^2.0 || ^3.0"
 	},
 	"autoload": {
 		"classmap": ["src/"]

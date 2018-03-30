@@ -2,12 +2,12 @@
 
 namespace DG\PhpExtensionsFinder;
 
+use PhpParser;
+
+
 class Finder
 {
-	private $coreExtensions = ['Core', 'SPL', 'standard', 'date', 'pcre'];
-
-	/** @var array */
-	private $list;
+	private $coreExtensions = ['Core', 'SPL', 'Reflection', 'standard', 'date', 'pcre'];
 
 
 	/**
@@ -15,59 +15,42 @@ class Finder
 	 */
 	public function go($dir)
 	{
-		$this->list = [];
+		$parser = (new PhpParser\ParserFactory)->create(PhpParser\ParserFactory::PREFER_PHP7);
+		$collector = new Collector;
+		$traverser = new PhpParser\NodeTraverser;
+		$traverser->addVisitor(new PhpParser\NodeVisitor\NameResolver);
+		$traverser->addVisitor($collector);
 
 		foreach (\Nette\Utils\Finder::findFiles('*.php')->from($dir) as $file) {
-			$this->parseFile((string) $file);
+			$collector->file = (string) $file;
+			try {
+				$nodes = $parser->parse(file_get_contents($collector->file));
+			} catch (PhpParser\Error $e) {
+				echo $file . ': ' . $e->getMessage() . "\n";
+				continue;
+			}
+			$traverser->traverse($nodes);
 		}
 
 		foreach ($this->coreExtensions as $ext) {
-			unset($this->list[$ext]);
+			unset($collector->list[$ext]);
 		}
 
-		foreach ($this->list as $ext => $info) {
+		foreach ($collector->list as $ext => $info) {
 			echo "\n$ext\n--------\n";
-			foreach ($info as $function => $usages) {
+			foreach ($info as $token => $usages) {
 				foreach ($usages as $file => $lines) {
 					foreach ($lines as $line) {
-						echo "$file:$line $function()\n";
+						echo "$file:$line $token\n";
 					}
 				}
 			}
 		}
 
 		$json = [];
-		foreach ($this->list as $ext => $info) {
+		foreach ($collector->list as $ext => $info) {
 			$json['require']["ext-$ext"] = '*';
 		}
 		echo "\nComposer\n--------\n", json_encode($json, JSON_PRETTY_PRINT);
-	}
-
-
-	private function parseFile($file)
-	{
-		$tokens = token_get_all(file_get_contents($file));
-		foreach ($tokens as $i => $token) {
-			if (is_array($token) && $token[0] === T_WHITESPACE) {
-				unset($tokens[$i]);
-			}
-		}
-		$tokens = array_values($tokens);
-
-		foreach ($tokens as $i => $token) {
-			if ($token === '('
-				&& $tokens[$i - 1][0] === T_STRING
-				&& $tokens[$i - 2][0] !== T_DOUBLE_COLON
-				&& $tokens[$i - 2][0] !== T_OBJECT_OPERATOR
-				&& $tokens[$i - 2][0] !== T_FUNCTION
-				&& $tokens[$i - 2][0] !== T_NEW
-				&& $tokens[$i - 2][0] !== T_NS_SEPARATOR
-				&& $tokens[$i - 2] !== '&'
-				&& function_exists($func = $tokens[$i - 1][1])
-				&& ($extName = (new \ReflectionFunction($func))->getExtensionName())
-			) {
-				$this->list[$extName][$func][$file][] = $tokens[$i - 1][2];
-			}
-		}
 	}
 }
