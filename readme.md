@@ -3,29 +3,13 @@ PHP Extensions Finder for Composer
 
 This tool finds which PHP extensions are required by source code.
 
-It requires PHP 5.4.0 or newer. The best way how to install it is to use Composer:
 
-```
-composer create-project dg/php-extensions-finder
-```
+Usage
+-----
 
-Usage:
-
-```
-php php-extensions-finder [<path>]
-```
-
-Or install globally via:
-```
-composer global require dg/php-extensions-finder
-```
-
-And use via:
 ```
 php-extensions-finder [<path>]
 ```
-Make sure your global vendor binaries directory is in your `$PATH` environment variable. (https://getcomposer.org/doc/03-cli.md#global)
-
 
 It generates result like:
 
@@ -41,3 +25,23 @@ It generates result like:
 	}
 }
 ```
+
+
+Installation
+------------
+
+It requires PHP 5.4.0 or newer.
+
+Install it via Composer. This project is not meant to be run as a dependency, so install it as standalone:
+
+```
+composer create-project dg/php-extensions-finder
+```
+
+Or install it globally via:
+
+```
+composer global require dg/php-extensions-finder
+```
+
+and make sure your global vendor binaries directory is in [your `$PATH` environment variable](https://getcomposer.org/doc/03-cli.md#global).
