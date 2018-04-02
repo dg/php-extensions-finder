@@ -1,8 +1,12 @@
 <?php
 
-require is_file(__DIR__ . '/../vendor/autoload.php')
+$autoload = is_file(__DIR__ . '/../vendor/autoload.php')
 	? __DIR__ . '/../vendor/autoload.php'
 	: __DIR__ . '/../../../autoload.php';
+if (@!include $autoload) {
+	echo 'Install packages using `composer update`';
+	exit(1);
+}
 
 
 set_exception_handler(function ($e) {
