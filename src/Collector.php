@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DG\PhpExtensionsFinder;
 
 use PhpParser\Node;
@@ -9,11 +11,8 @@ use PhpParser\NodeVisitorAbstract;
 
 class Collector extends NodeVisitorAbstract
 {
-	/** @var string */
-	public $file;
-
-	/** @var array */
-	public $list = [];
+	public string $file;
+	public array $list = [];
 
 
 	public function enterNode(Node $node)
@@ -29,7 +28,7 @@ class Collector extends NodeVisitorAbstract
 					$this->addExtension(
 						(new \ReflectionClass($name))->getExtensionName(),
 						$name,
-						$node->class->getAttribute('startLine')
+						$node->class->getAttribute('startLine'),
 					);
 				}
 			}
@@ -40,7 +39,7 @@ class Collector extends NodeVisitorAbstract
 				$this->addExtension(
 					(new \ReflectionFunction($name))->getExtensionName(),
 					$name,
-					$node->name->getAttribute('startLine')
+					$node->name->getAttribute('startLine'),
 				);
 			}
 
@@ -52,7 +51,7 @@ class Collector extends NodeVisitorAbstract
 					$this->addExtension(
 						$ext,
 						$name,
-						$node->name->getAttribute('startLine')
+						$node->name->getAttribute('startLine'),
 					);
 					break;
 				}
@@ -61,7 +60,7 @@ class Collector extends NodeVisitorAbstract
 	}
 
 
-	private function addExtension($extName, $token, $line)
+	private function addExtension(string|false $extName, string $token, int $line): void
 	{
 		if ($extName) {
 			$this->list[$extName][$token][$this->file][] = $line;

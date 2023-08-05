@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DG\PhpExtensionsFinder;
 
 use PhpParser;
@@ -7,13 +9,10 @@ use PhpParser;
 
 class Finder
 {
-	private $coreExtensions = ['Core', 'SPL', 'Reflection', 'standard', 'date', 'pcre'];
+	private array $coreExtensions = ['Core', 'SPL', 'Reflection', 'standard', 'date', 'pcre'];
 
 
-	/**
-	 * @return void
-	 */
-	public function go($dir)
+	public function go($dir): void
 	{
 		$parser = (new PhpParser\ParserFactory)->create(PhpParser\ParserFactory::PREFER_PHP7);
 		$collector = new Collector;
