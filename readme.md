@@ -30,7 +30,7 @@ It generates result like:
 Installation
 ------------
 
-It requires PHP 5.4.0 or newer.
+It requires PHP 8.0 or newer.
 
 Install it via Composer. This project is not meant to be run as a dependency, so install it as standalone:
 
