@@ -31,11 +31,13 @@ class Finder
 			$traverser->traverse($nodes);
 		}
 
-		foreach ($this->coreExtensions as $ext) {
-			unset($collector->list[$ext]);
-		}
-
+		$json = [];
 		foreach ($collector->list as $ext => $info) {
+			if (in_array($ext, $this->coreExtensions, true)) {
+				continue;
+			}
+
+			$json['require']["ext-$ext"] = '*';
 			echo "\n$ext\n--------\n";
 			foreach ($info as $token => $usages) {
 				foreach ($usages as $file => $lines) {
@@ -46,10 +48,6 @@ class Finder
 			}
 		}
 
-		$json = [];
-		foreach ($collector->list as $ext => $info) {
-			$json['require']["ext-$ext"] = '*';
-		}
 		echo "\nComposer\n--------\n", json_encode($json, JSON_PRETTY_PRINT);
 	}
 }
