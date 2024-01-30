@@ -9,7 +9,8 @@ use PhpParser;
 
 class Finder
 {
-	private array $coreExtensions = ['Core', 'SPL', 'Reflection', 'standard', 'date', 'pcre'];
+	// https://www.php.net/manual/en/extensions.membership.php
+	private array $coreExtensions = ['Core', 'SPL', 'Reflection', 'standard', 'date', 'pcre', 'hash', 'json', 'random'];
 
 
 	public function go($dir): void
