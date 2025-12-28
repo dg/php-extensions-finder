@@ -21,6 +21,7 @@ Run the tool from the command line:
 The tool outputs:
 1. Detailed list of extensions found with file:line references
 2. JSON-formatted composer.json require block
+3. php.ini format with extension directives
 
 ## Architecture
 
@@ -37,9 +38,9 @@ The tool outputs:
   - Uses reflection to map detected symbols to their extensions
   - Stores findings by extension → token → file → line numbers
 - **`Reporter`**: Generates output reports from collected data
-  - Takes collected extension data and list of core extensions
-  - Currently generates two formats: detailed list and composer.json
-  - Designed to be extensible for additional output formats (php.ini, etc.)
+  - Takes collected extension data and filters out core extensions in constructor
+  - Generates three formats: detailed list, composer.json, and php.ini
+  - Designed to be extensible for additional output formats
 
 ### Extension Detection Strategy
 
