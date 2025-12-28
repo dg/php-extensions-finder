@@ -12,7 +12,7 @@ require __DIR__ . '/bootstrap.php';
 test('detects classes from extensions', function () {
 	$code = '<?php $pdo = new PDO("mysql:host=localhost", "user", "pass");';
 
-	$parser = (new ParserFactory)->create(ParserFactory::PREFER_PHP7);
+	$parser = (new ParserFactory)->createForNewestSupportedVersion();
 	$collector = new Collector;
 	$collector->file = 'test.php';
 
@@ -33,7 +33,7 @@ test('detects classes from extensions', function () {
 test('detects functions from extensions', function () {
 	$code = '<?php curl_init("https://example.com");';
 
-	$parser = (new ParserFactory)->create(ParserFactory::PREFER_PHP7);
+	$parser = (new ParserFactory)->createForNewestSupportedVersion();
 	$collector = new Collector;
 	$collector->file = 'test.php';
 
@@ -54,7 +54,7 @@ test('detects functions from extensions', function () {
 test('detects constants from extensions', function () {
 	$code = '<?php $opt = CURLOPT_RETURNTRANSFER;';
 
-	$parser = (new ParserFactory)->create(ParserFactory::PREFER_PHP7);
+	$parser = (new ParserFactory)->createForNewestSupportedVersion();
 	$collector = new Collector;
 	$collector->file = 'test.php';
 
@@ -76,7 +76,7 @@ test('tracks multiple usages across multiple files', function () {
 	$code1 = '<?php $pdo1 = new PDO("", "", "");';
 	$code2 = '<?php $pdo2 = new PDO("", "", "");';
 
-	$parser = (new ParserFactory)->create(ParserFactory::PREFER_PHP7);
+	$parser = (new ParserFactory)->createForNewestSupportedVersion();
 	$collector = new Collector;
 
 	$traverser = new NodeTraverser;
@@ -112,7 +112,7 @@ $pdo2 = new PDO("", "", "");
 $pdo3 = new PDO("", "", "");
 ';
 
-	$parser = (new ParserFactory)->create(ParserFactory::PREFER_PHP7);
+	$parser = (new ParserFactory)->createForNewestSupportedVersion();
 	$collector = new Collector;
 	$collector->file = 'test.php';
 
@@ -130,7 +130,7 @@ $pdo3 = new PDO("", "", "");
 test('ignores non-existent classes', function () {
 	$code = '<?php $obj = new NonExistentClass();';
 
-	$parser = (new ParserFactory)->create(ParserFactory::PREFER_PHP7);
+	$parser = (new ParserFactory)->createForNewestSupportedVersion();
 	$collector = new Collector;
 	$collector->file = 'test.php';
 
@@ -148,7 +148,7 @@ test('ignores non-existent classes', function () {
 test('ignores non-existent functions', function () {
 	$code = '<?php non_existent_function();';
 
-	$parser = (new ParserFactory)->create(ParserFactory::PREFER_PHP7);
+	$parser = (new ParserFactory)->createForNewestSupportedVersion();
 	$collector = new Collector;
 	$collector->file = 'test.php';
 
@@ -166,7 +166,7 @@ test('ignores non-existent functions', function () {
 test('detects static method calls', function () {
 	$code = '<?php PDO::getAvailableDrivers();';
 
-	$parser = (new ParserFactory)->create(ParserFactory::PREFER_PHP7);
+	$parser = (new ParserFactory)->createForNewestSupportedVersion();
 	$collector = new Collector;
 	$collector->file = 'test.php';
 
@@ -187,7 +187,7 @@ test('detects static method calls', function () {
 test('detects class constants', function () {
 	$code = '<?php $attr = PDO::ATTR_ERRMODE;';
 
-	$parser = (new ParserFactory)->create(ParserFactory::PREFER_PHP7);
+	$parser = (new ParserFactory)->createForNewestSupportedVersion();
 	$collector = new Collector;
 	$collector->file = 'test.php';
 
