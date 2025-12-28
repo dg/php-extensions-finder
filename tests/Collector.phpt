@@ -25,9 +25,10 @@ test('detects classes from extensions', function () {
 	$nodes = $parser->parse($code);
 	$traverser->traverse($nodes);
 
-	Assert::true(isset($collector->list['PDO']));
-	Assert::true(isset($collector->list['PDO']['PDO']));
-	Assert::same(['test.php' => [1]], $collector->list['PDO']['PDO']);
+	Assert::same(
+		['PDO' => ['test.php' => [1]]],
+		$collector->list['PDO'],
+	);
 });
 
 
@@ -45,8 +46,10 @@ test('detects functions from extensions', function () {
 	$nodes = $parser->parse($code);
 	$traverser->traverse($nodes);
 
-	Assert::true(isset($collector->list['curl']));
-	Assert::true(isset($collector->list['curl']['curl_init']));
+	Assert::same(
+		['curl_init' => ['test.php' => [1]]],
+		$collector->list['curl'],
+	);
 });
 
 
@@ -64,8 +67,10 @@ test('detects constants from extensions', function () {
 	$nodes = $parser->parse($code);
 	$traverser->traverse($nodes);
 
-	Assert::true(isset($collector->list['curl']));
-	Assert::true(isset($collector->list['curl']['CURLOPT_RETURNTRANSFER']));
+	Assert::same(
+		['CURLOPT_RETURNTRANSFER' => ['test.php' => [1]]],
+		$collector->list['curl'],
+	);
 });
 
 
@@ -90,9 +95,15 @@ test('tracks multiple usages across multiple files', function () {
 	$nodes = $parser->parse($code2);
 	$traverser->traverse($nodes);
 
-	Assert::count(2, $collector->list['PDO']['PDO']);
-	Assert::true(isset($collector->list['PDO']['PDO']['file1.php']));
-	Assert::true(isset($collector->list['PDO']['PDO']['file2.php']));
+	Assert::same(
+		[
+			'PDO' => [
+				'file1.php' => [1],
+				'file2.php' => [1],
+			],
+		],
+		$collector->list['PDO'],
+	);
 });
 
 
@@ -168,8 +179,10 @@ test('detects static method calls', function () {
 	$nodes = $parser->parse($code);
 	$traverser->traverse($nodes);
 
-	Assert::true(isset($collector->list['PDO']));
-	Assert::true(isset($collector->list['PDO']['PDO']));
+	Assert::same(
+		['PDO' => ['test.php' => [1]]],
+		$collector->list['PDO'],
+	);
 });
 
 
@@ -187,6 +200,8 @@ test('detects class constants', function () {
 	$nodes = $parser->parse($code);
 	$traverser->traverse($nodes);
 
-	Assert::true(isset($collector->list['PDO']));
-	Assert::true(isset($collector->list['PDO']['PDO']));
+	Assert::same(
+		['PDO' => ['test.php' => [1]]],
+		$collector->list['PDO'],
+	);
 });
