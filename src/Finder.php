@@ -15,7 +15,7 @@ class Finder
 
 	public function go($dir): void
 	{
-		$parser = (new PhpParser\ParserFactory)->create(PhpParser\ParserFactory::PREFER_PHP7);
+		$parser = (new PhpParser\ParserFactory)->createForNewestSupportedVersion();
 		$collector = new Collector;
 		$traverser = new PhpParser\NodeTraverser;
 		$traverser->addVisitor(new PhpParser\NodeVisitor\NameResolver);
