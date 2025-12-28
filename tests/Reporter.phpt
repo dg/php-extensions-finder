@@ -17,8 +17,11 @@ test('generates detailed report', function () {
 			],
 		],
 		'curl' => [
-			'curl_init' => [
+			'curl_init()' => [
 				'file1.php' => [5],
+			],
+			'CURLOPT_RETURNTRANSFER' => [
+				'file1.php' => [6],
 			],
 		],
 	];
@@ -27,11 +30,11 @@ test('generates detailed report', function () {
 	$report = $reporter->generateReport();
 
 	Assert::contains('PDO', $report);
-	Assert::contains('file1.php:10 PDO', $report);
-	Assert::contains('file1.php:20 PDO', $report);
-	Assert::contains('file2.php:15 PDO', $report);
+	Assert::contains('file1.php:', $report);
+	Assert::contains('file2.php:', $report);
 	Assert::contains('curl', $report);
-	Assert::contains('file1.php:5 curl_init', $report);
+	Assert::contains('curl_init()', $report);
+	Assert::contains('CURLOPT_RETURNTRANSFER', $report);
 });
 
 
@@ -41,10 +44,10 @@ test('filters out core extensions from report', function () {
 			'PDO' => ['file1.php' => [10]],
 		],
 		'Core' => [
-			'strlen' => ['file1.php' => [5]],
+			'strlen()' => ['file1.php' => [5]],
 		],
 		'standard' => [
-			'array_map' => ['file1.php' => [8]],
+			'array_map()' => ['file1.php' => [8]],
 		],
 	];
 
@@ -52,10 +55,11 @@ test('filters out core extensions from report', function () {
 	$report = $reporter->generateReport();
 
 	Assert::contains('PDO', $report);
+	Assert::contains('file1.php:', $report);
 	Assert::notContains('Core', $report);
 	Assert::notContains('standard', $report);
-	Assert::notContains('strlen', $report);
-	Assert::notContains('array_map', $report);
+	Assert::notContains('strlen()', $report);
+	Assert::notContains('array_map()', $report);
 });
 
 
@@ -65,10 +69,10 @@ test('generates composer.json structure', function () {
 			'PDO' => ['file1.php' => [10]],
 		],
 		'curl' => [
-			'curl_init' => ['file1.php' => [5]],
+			'curl_init()' => ['file1.php' => [5]],
 		],
 		'mbstring' => [
-			'mb_strlen' => ['file1.php' => [8]],
+			'mb_strlen()' => ['file1.php' => [8]],
 		],
 	];
 
@@ -91,7 +95,7 @@ test('filters core extensions from composer.json', function () {
 			'PDO' => ['file1.php' => [10]],
 		],
 		'Core' => [
-			'strlen' => ['file1.php' => [5]],
+			'strlen()' => ['file1.php' => [5]],
 		],
 		'SPL' => [
 			'ArrayIterator' => ['file1.php' => [7]],

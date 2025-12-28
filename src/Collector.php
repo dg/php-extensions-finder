@@ -38,7 +38,7 @@ class Collector extends NodeVisitorAbstract
 			if (function_exists($name)) {
 				$this->addExtension(
 					(new \ReflectionFunction($name))->getExtensionName(),
-					$name,
+					$name . '()',
 					$node->name->getAttribute('startLine'),
 				);
 			}

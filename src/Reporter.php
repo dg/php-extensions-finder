@@ -25,13 +25,23 @@ class Reporter
 	{
 		$res = '';
 		foreach ($this->list as $ext => $info) {
-			$res .= "\n$ext\n--------\n";
+			$res .= "\n$ext\n" . str_repeat('-', strlen($ext)) . "\n";
+
+			// Reorganize data: file -> [tokens]
+			$byFile = [];
 			foreach ($info as $token => $usages) {
 				foreach ($usages as $file => $lines) {
-					foreach ($lines as $line) {
-						$res .= "$file:$line $token\n";
+					if (!isset($byFile[$file])) {
+						$byFile[$file] = [];
 					}
+					$byFile[$file][] = $token;
 				}
+			}
+
+			foreach ($byFile as $file => $tokens) {
+				$tokens = array_unique($tokens);
+				sort($tokens);
+				$res .= "$file:\n- " . implode(', ', $tokens) . "\n\n";
 			}
 		}
 
@@ -45,6 +55,7 @@ class Reporter
 		foreach ($this->list as $ext => $info) {
 			$json['require']["ext-$ext"] = '*';
 		}
+
 		return $json;
 	}
 }

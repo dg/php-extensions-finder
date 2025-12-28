@@ -47,7 +47,7 @@ test('detects functions from extensions', function () {
 	$traverser->traverse($nodes);
 
 	Assert::same(
-		['curl_init' => ['test.php' => [1]]],
+		['curl_init()' => ['test.php' => [1]]],
 		$collector->list['curl'],
 	);
 });
