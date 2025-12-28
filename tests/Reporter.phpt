@@ -120,7 +120,51 @@ test('handles empty list', function () {
 	$reporter = new Reporter([]);
 	$report = $reporter->generateReport();
 	$json = $reporter->generateComposerJson();
+	$phpIni = $reporter->generatePhpIni();
 
 	Assert::same('', $report);
 	Assert::same([], $json);
+	Assert::same('', $phpIni);
+});
+
+
+test('generates php.ini format', function () {
+	$list = [
+		'PDO' => [
+			'PDO' => ['file1.php' => [10]],
+		],
+		'curl' => [
+			'curl_init()' => ['file1.php' => [5]],
+		],
+		'mbstring' => [
+			'mb_strlen()' => ['file1.php' => [8]],
+		],
+	];
+
+	$reporter = new Reporter($list);
+	$phpIni = $reporter->generatePhpIni();
+
+	Assert::same("extension=pdo\nextension=curl\nextension=mbstring\n", $phpIni);
+});
+
+
+test('filters core extensions from php.ini', function () {
+	$list = [
+		'PDO' => [
+			'PDO' => ['file1.php' => [10]],
+		],
+		'Core' => [
+			'strlen()' => ['file1.php' => [5]],
+		],
+		'SPL' => [
+			'ArrayIterator' => ['file1.php' => [7]],
+		],
+	];
+
+	$reporter = new Reporter($list);
+	$phpIni = $reporter->generatePhpIni();
+
+	Assert::same("extension=pdo\n", $phpIni);
+	Assert::notContains('core', $phpIni);
+	Assert::notContains('spl', $phpIni);
 });

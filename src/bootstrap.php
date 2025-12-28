@@ -46,3 +46,6 @@ echo $reporter->generateReport();
 
 $composer = $reporter->generateComposerJson();
 echo "\nComposer\n--------\n", json_encode($composer, JSON_PRETTY_PRINT);
+
+$phpIni = $reporter->generatePhpIni();
+echo "\n\nphp.ini\n-------\n", $phpIni;

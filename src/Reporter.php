@@ -58,4 +58,15 @@ class Reporter
 
 		return $json;
 	}
+
+
+	public function generatePhpIni(): string
+	{
+		$res = '';
+		foreach ($this->list as $ext => $info) {
+			$res .= 'extension=' . strtolower($ext) . "\n";
+		}
+
+		return $res;
+	}
 }
