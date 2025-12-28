@@ -2,6 +2,11 @@
 
 declare(strict_types=1);
 
+namespace DG\PhpExtensionsFinder;
+
+use Nette;
+
+
 $autoload = is_file(__DIR__ . '/../vendor/autoload.php')
 	? __DIR__ . '/../vendor/autoload.php'
 	: __DIR__ . '/../../../autoload.php';
@@ -33,5 +38,11 @@ if ($cmd->isEmpty()) {
 	$cmd->help();
 }
 
-$finder = new DG\PhpExtensionsFinder\Finder;
-$finder->go($options['path']);
+$finder = new Finder;
+$list = $finder->scan($options['path']);
+
+$reporter = new Reporter($list);
+echo $reporter->generateReport();
+
+$composer = $reporter->generateComposerJson();
+echo "\nComposer\n--------\n", json_encode($composer, JSON_PRETTY_PRINT);

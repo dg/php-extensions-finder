@@ -28,14 +28,18 @@ The tool outputs:
 
 - **`php-extensions-finder`**: Executable entry point that loads bootstrap
 - **`bootstrap.php`**: Sets up autoloading, exception handling, and CLI argument parsing
-- **`Finder`**: Main orchestrator that coordinates parsing and output
+- **`Finder`**: Main orchestrator that coordinates parsing
   - Maintains list of core PHP extensions to filter out
   - Iterates through PHP files and manages the parsing pipeline
-  - Formats and outputs results
+  - Delegates report generation to Reporter
 - **`Collector`**: AST visitor (extends NodeVisitorAbstract) that detects extension usage
   - Tracks static calls, property fetches, class constants, new instances, function calls, and constant usage
   - Uses reflection to map detected symbols to their extensions
   - Stores findings by extension → token → file → line numbers
+- **`Reporter`**: Generates output reports from collected data
+  - Takes collected extension data and list of core extensions
+  - Currently generates two formats: detailed list and composer.json
+  - Designed to be extensible for additional output formats (php.ini, etc.)
 
 ### Extension Detection Strategy
 

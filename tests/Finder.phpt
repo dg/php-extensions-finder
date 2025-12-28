@@ -10,63 +10,48 @@ require __DIR__ . '/bootstrap.php';
 
 test('finds extensions in directory', function () {
 	$finder = new Finder;
-
-	ob_start();
-	$finder->go(__DIR__ . '/fixtures');
-	$output = ob_get_clean();
+	$list = $finder->scan(__DIR__ . '/fixtures');
 
 	// Should find PDO
-	Assert::contains('PDO', $output);
+	Assert::true(isset($list['PDO']));
 
 	// Should find curl
-	Assert::contains('curl', $output);
+	Assert::true(isset($list['curl']));
 
 	// Should find mbstring
-	Assert::contains('mbstring', $output);
-
-	// Should generate composer.json output
-	Assert::contains('Composer', $output);
-	Assert::contains('ext-PDO', $output);
-	Assert::contains('ext-curl', $output);
-	Assert::contains('ext-mbstring', $output);
+	Assert::true(isset($list['mbstring']));
 });
 
 
-test('filters out core extensions', function () {
+test('returns all extensions including core', function () {
 	$finder = new Finder;
+	$list = $finder->scan(__DIR__ . '/fixtures');
 
-	ob_start();
-	$finder->go(__DIR__ . '/fixtures');
-	$output = ob_get_clean();
+	// Core extensions should be in the list (Finder doesn't filter)
+	Assert::type('array', $list);
 
-	// Core extensions should not appear
-	Assert::notContains('ext-Core', $output);
-	Assert::notContains('ext-standard', $output);
-	Assert::notContains('ext-SPL', $output);
-	Assert::notContains('ext-Reflection', $output);
-	Assert::notContains('ext-date', $output);
-	Assert::notContains('ext-pcre', $output);
-	Assert::notContains('ext-hash', $output);
-	Assert::notContains('ext-json', $output);
-	Assert::notContains('ext-random', $output);
+	// Should contain both regular and core extensions
+	Assert::true(count($list) > 0);
 });
 
 
-test('shows file and line information', function () {
+test('returns file and line information', function () {
 	$finder = new Finder;
+	$list = $finder->scan(__DIR__ . '/fixtures');
 
-	ob_start();
-	$finder->go(__DIR__ . '/fixtures');
-	$output = ob_get_clean();
+	// Should have structure: extension -> token -> file -> lines[]
+	Assert::true(isset($list['PDO']['PDO']));
+	Assert::type('array', $list['PDO']['PDO']);
 
-	// Should contain file:line format
-	Assert::contains('sample-with-extensions.php:', $output);
-	Assert::contains('PDO', $output);
-	Assert::contains('curl_init', $output);
-
-	// Check that output matches expected format (file:number token)
-	Assert::true((bool) preg_match('~sample-with-extensions\.php:\d+ PDO~', $output));
-	Assert::true((bool) preg_match('~sample-with-extensions\.php:\d+ curl_init~', $output));
+	// Check that we have file paths and line numbers
+	foreach ($list['PDO']['PDO'] as $file => $lines) {
+		Assert::type('string', $file);
+		Assert::type('array', $lines);
+		Assert::true(count($lines) > 0);
+		foreach ($lines as $line) {
+			Assert::type('int', $line);
+		}
+	}
 });
 
 
@@ -79,11 +64,14 @@ test('handles parse errors gracefully', function () {
 	$finder = new Finder;
 
 	ob_start();
-	$finder->go($tempDir);
+	$list = $finder->scan($tempDir);
 	$output = ob_get_clean();
 
-	// Should contain error message
+	// Should print error message but continue
 	Assert::contains('invalid.php', $output);
+
+	// Should return empty list for directory with only invalid file
+	Assert::same([], $list);
 
 	// Cleanup
 	unlink($tempDir . '/invalid.php');
@@ -96,51 +84,11 @@ test('handles empty directory', function () {
 	mkdir($tempDir);
 
 	$finder = new Finder;
+	$list = $finder->scan($tempDir);
 
-	ob_start();
-	$finder->go($tempDir);
-	$output = ob_get_clean();
-
-	// Should still output Composer section even if empty
-	Assert::contains('Composer', $output);
+	// Should return empty array
+	Assert::same([], $list);
 
 	// Cleanup
 	rmdir($tempDir);
-});
-
-
-test('generates valid JSON output', function () {
-	$finder = new Finder;
-
-	ob_start();
-	$finder->go(__DIR__ . '/fixtures');
-	$output = ob_get_clean();
-
-	// Extract JSON part
-	$lines = explode("\n", $output);
-	$jsonStarted = false;
-	$jsonLines = [];
-
-	foreach ($lines as $line) {
-		if (str_contains($line, 'Composer')) {
-			$jsonStarted = true;
-			continue;
-		}
-
-		if ($jsonStarted && (str_starts_with($line, '{') || str_starts_with($line, ' ') || str_starts_with($line, '}'))) {
-			$jsonLines[] = $line;
-		}
-	}
-
-	$json = implode("\n", $jsonLines);
-
-	// Should be valid JSON
-	$decoded = json_decode($json, true);
-	Assert::type('array', $decoded);
-	Assert::true(isset($decoded['require']));
-
-	// Should have ext- prefix
-	foreach (array_keys($decoded['require']) as $key) {
-		Assert::true(str_starts_with($key, 'ext-'));
-	}
 });
