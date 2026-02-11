@@ -11,7 +11,7 @@
 	],
 	"require": {
 		"php": ">=8.0",
-		"nette/command-line": "^1.0",
+		"nette/command-line": "^2.0",
 		"nette/utils": "^4.0",
 		"nette/tester": "^2.5",
 		"nikic/php-parser": "^5.7"

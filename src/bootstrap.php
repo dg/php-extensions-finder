@@ -27,7 +27,7 @@ $cmd = new Nette\CommandLine\Parser(
 
 		XX,
 	[
-		'path' => [Nette\CommandLine\Parser::VALUE => getcwd()],
+		'path' => [Nette\CommandLine\Parser::Default => getcwd()],
 	],
 );
 
