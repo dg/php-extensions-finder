@@ -8,6 +8,11 @@ use PhpParser;
 
 class Finder
 {
+	public array $ignore = [
+		'.git', '.idea', '.claude', '*.tmp', 'tmp', 'temp', 'log', 'vendor', 'node_modules',
+	];
+
+
 	public function scan($dir): array
 	{
 		$parser = (new PhpParser\ParserFactory)->createForNewestSupportedVersion();
@@ -16,7 +21,7 @@ class Finder
 		$traverser->addVisitor(new PhpParser\NodeVisitor\NameResolver);
 		$traverser->addVisitor($collector);
 
-		foreach (Nette\Utils\Finder::findFiles('*.php')->from($dir) as $file) {
+		foreach ($this->getFiles($dir) as $file) {
 			$collector->file = (string) $file;
 			try {
 				$nodes = $parser->parse(file_get_contents($collector->file));
@@ -28,5 +33,14 @@ class Finder
 		}
 
 		return $collector->list;
+	}
+
+
+	private function getFiles($dir): Nette\Utils\Finder
+	{
+		return Nette\Utils\Finder::findFiles('*.php')
+			->exclude($this->ignore)
+			->from($dir)
+			->exclude($this->ignore);
 	}
 }
