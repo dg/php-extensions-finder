@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
 
 use DG\PhpExtensionsFinder\Finder;
+use Nette\CommandLine\Console;
 use Tester\Assert;
 
 require __DIR__ . '/bootstrap.php';
@@ -59,11 +60,12 @@ test('handles parse errors gracefully', function () {
 	mkdir($tempDir);
 	file_put_contents($tempDir . '/invalid.php', '<?php this is not valid PHP syntax');
 
-	$finder = new Finder;
+	$stream = fopen('php://memory', 'w+');
+	$finder = new Finder(new Console($stream));
 
-	ob_start();
 	$list = $finder->scan($tempDir);
-	$output = ob_get_clean();
+	rewind($stream);
+	$output = stream_get_contents($stream);
 
 	// Should print error message but continue
 	Assert::contains('invalid.php', $output);

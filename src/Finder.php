@@ -12,6 +12,14 @@ class Finder
 		'.git', '.idea', '.claude', '*.tmp', 'tmp', 'temp', 'log', 'vendor', 'node_modules',
 	];
 
+	private Nette\CommandLine\Console $console;
+
+
+	public function __construct(?Nette\CommandLine\Console $console = null)
+	{
+		$this->console = $console ?? new Nette\CommandLine\Console(STDERR);
+	}
+
 
 	public function scan($dir): array
 	{
@@ -26,7 +34,7 @@ class Finder
 			try {
 				$nodes = $parser->parse(file_get_contents($collector->file));
 			} catch (PhpParser\Error $e) {
-				echo $file . ': ' . $e->getMessage() . "\n";
+				$this->console->writeLine($file . ': ' . $e->getMessage(), 'yellow');
 				continue;
 			}
 			$traverser->traverse($nodes);

@@ -2,7 +2,11 @@
 
 namespace DG\PhpExtensionsFinder;
 
-use Nette;
+use Nette\CommandLine\Command;
+use Nette\CommandLine\Console;
+use Nette\CommandLine\HelpRenderer;
+use Nette\CommandLine\Normalizers;
+use Nette\CommandLine\Parser;
 
 $autoload = is_file(__DIR__ . '/../vendor/autoload.php')
 	? __DIR__ . '/../vendor/autoload.php'
@@ -13,36 +17,43 @@ if (@!include $autoload) { // @ dependencies may not be installed
 }
 
 
-set_exception_handler(function ($e) {
-	echo "ERROR: {$e->getMessage()}\n";
+$stdout = new Console(STDOUT);
+$stderr = new Console(STDERR);
+
+set_exception_handler(function ($e) use ($stderr) {
+	$stderr->writeLine("ERROR: {$e->getMessage()}", 'red');
 	exit(1);
 });
 
 
-$cmd = new Nette\CommandLine\Parser(
-	<<<'XX'
-		Usage:
-			php php-extensions-finder [<path>]
-
-		XX,
-	[
-		'path' => [Nette\CommandLine\Parser::VALUE => getcwd()],
-	],
+$command = new Command('php-extensions-finder', 'Finds PHP extensions required by code.');
+$command->addFlag('--help', 'Show this help', alias: '-h', standalone: true);
+$command->addArgument(
+	'path',
+	'Directory to scan',
+	optional: true,
+	normalizer: Normalizers::realPath(...),
+	default: getcwd(),
+	defaultDescription: 'current directory',
 );
 
-$options = $cmd->parse();
-if ($cmd->isEmpty()) {
-	$cmd->help();
+$args = (new Parser)->parse($command);
+$helpRenderer = new HelpRenderer($stdout);
+if ($args['--help']) {
+	$helpRenderer->render($command);
+	exit;
+} elseif ($args->isEmpty()) { // a bare run recalls the usage and then scans the current directory
+	$helpRenderer->render($command);
 }
 
-$finder = new Finder;
-$list = $finder->scan($options['path']);
+$finder = new Finder($stderr);
+$list = $finder->scan($args['path']);
 
 $reporter = new Reporter($list);
-echo $reporter->generateReport();
+$stdout->write($reporter->generateReport());
 
 $composer = $reporter->generateComposerJson();
-echo "\nComposer\n--------\n", json_encode($composer, JSON_PRETTY_PRINT);
+$stdout->write("\nComposer\n--------\n" . json_encode($composer, JSON_PRETTY_PRINT));
 
 $phpIni = $reporter->generatePhpIni();
-echo "\n\nphp.ini\n-------\n", $phpIni;
+$stdout->write("\n\nphp.ini\n-------\n" . $phpIni);
