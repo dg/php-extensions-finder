@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 $autoload = is_file(__DIR__ . '/../vendor/autoload.php')
 	? __DIR__ . '/../vendor/autoload.php'
