@@ -1,0 +1,26 @@
+use:
+	- nette
+	- modernizations
+
+paths:
+	- src
+	- tests
+	- php-extensions-finder
+
+excludePaths:
+	- tests/**/output
+	- fixtures
+
+fileExtensions:
+	- php
+	- phpt
+
+imports: {grouping: {class: grouped}}
+
+overrides:
+	-
+		paths: [src]
+		nameResolution: certain
+		use:
+			- compilerOptimizations
+			- deprecations
