@@ -2,9 +2,8 @@
 
 namespace DG\PhpExtensionsFinder;
 
-use PhpParser\Node;
+use PhpParser\{Node, NodeVisitorAbstract};
 use PhpParser\Node\Expr;
-use PhpParser\NodeVisitorAbstract;
 
 
 class Collector extends NodeVisitorAbstract
