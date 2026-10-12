@@ -2,6 +2,8 @@
 
 namespace DG\PhpExtensionsFinder;
 
+use function strlen;
+
 
 class Reporter
 {

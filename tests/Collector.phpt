@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
 
 use DG\PhpExtensionsFinder\Collector;
-use PhpParser\NodeTraverser;
+use PhpParser\{NodeTraverser, ParserFactory};
 use PhpParser\NodeVisitor\NameResolver;
-use PhpParser\ParserFactory;
 use Tester\Assert;
 
 require __DIR__ . '/bootstrap.php';
