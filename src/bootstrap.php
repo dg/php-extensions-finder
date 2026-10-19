@@ -2,7 +2,7 @@
 
 namespace DG\PhpExtensionsFinder;
 
-use Nette\CommandLine\{Attributes as Cli, Command, Console, HelpRenderer, Normalizers, Parser, ParseResult};
+use Nette\CommandLine\{Attributes as Cli, Command, Console, HelpRenderer, Normalizers, ParseResult, Runner};
 
 $autoload = is_file(__DIR__ . '/../vendor/autoload.php')
 	? __DIR__ . '/../vendor/autoload.php'
@@ -44,12 +44,4 @@ $command = Command::from(#[Cli\Command('Finds PHP extensions required by code.',
 	$phpIni = $reporter->generatePhpIni();
 	$stdout->write("\n\nphp.ini\n-------\n" . $phpIni);
 });
-$command->addFlag('--help', 'Show this help', alias: '-h', standalone: true);
-
-$args = (new Parser)->parse($command);
-if ($args['--help']) {
-	(new HelpRenderer($stdout))->render($command);
-	exit;
-}
-
-exit($args->run());
+exit((new Runner($command, out: $stdout, err: $stderr))->run());
