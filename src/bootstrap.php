@@ -2,11 +2,7 @@
 
 namespace DG\PhpExtensionsFinder;
 
-use Nette\CommandLine\Command;
-use Nette\CommandLine\Console;
-use Nette\CommandLine\HelpRenderer;
-use Nette\CommandLine\Normalizers;
-use Nette\CommandLine\Parser;
+use Nette\CommandLine\{Attributes as Cli, Command, Console, HelpRenderer, Normalizers, Parser, ParseResult};
 
 $autoload = is_file(__DIR__ . '/../vendor/autoload.php')
 	? __DIR__ . '/../vendor/autoload.php'
@@ -26,34 +22,34 @@ set_exception_handler(function ($e) use ($stderr) {
 });
 
 
-$command = new Command('php-extensions-finder', 'Finds PHP extensions required by code.');
+$command = Command::from(#[Cli\Command('Finds PHP extensions required by code.', name: 'php-extensions-finder')] function (
+	ParseResult $args,
+	Command $command,
+	#[Cli\Argument('Directory to scan', normalizer: [Normalizers::class, 'realPath'], defaultDescription: 'current directory')]
+	?string $path = null,
+) use ($stdout, $stderr): void {
+	if ($args->isEmpty()) { // a bare run recalls the usage and then scans the current directory
+		(new HelpRenderer($stdout))->render($command);
+	}
+
+	$finder = new Finder($stderr);
+	$list = $finder->scan($path ?? (string) getcwd());
+
+	$reporter = new Reporter($list);
+	$stdout->write($reporter->generateReport());
+
+	$composer = $reporter->generateComposerJson();
+	$stdout->write("\nComposer\n--------\n" . json_encode($composer, JSON_PRETTY_PRINT));
+
+	$phpIni = $reporter->generatePhpIni();
+	$stdout->write("\n\nphp.ini\n-------\n" . $phpIni);
+});
 $command->addFlag('--help', 'Show this help', alias: '-h', standalone: true);
-$command->addArgument(
-	'path',
-	'Directory to scan',
-	optional: true,
-	normalizer: Normalizers::realPath(...),
-	default: getcwd(),
-	defaultDescription: 'current directory',
-);
 
 $args = (new Parser)->parse($command);
-$helpRenderer = new HelpRenderer($stdout);
 if ($args['--help']) {
-	$helpRenderer->render($command);
+	(new HelpRenderer($stdout))->render($command);
 	exit;
-} elseif ($args->isEmpty()) { // a bare run recalls the usage and then scans the current directory
-	$helpRenderer->render($command);
 }
 
-$finder = new Finder($stderr);
-$list = $finder->scan($args['path']);
-
-$reporter = new Reporter($list);
-$stdout->write($reporter->generateReport());
-
-$composer = $reporter->generateComposerJson();
-$stdout->write("\nComposer\n--------\n" . json_encode($composer, JSON_PRETTY_PRINT));
-
-$phpIni = $reporter->generatePhpIni();
-$stdout->write("\n\nphp.ini\n-------\n" . $phpIni);
+exit($args->run());
