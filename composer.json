@@ -1,7 +1,8 @@
 {
 	"name": "dg/php-extensions-finder",
 	"type": "project",
-	"description": "Finds PHP extensions required by code.",
+	"description": "🔎 PHP Extensions Finder: scans your code and lists the PHP extensions it needs, ready to paste into composer.json as ext-* requirements.",
+	"keywords": ["php extensions", "composer", "composer.json", "requirements", "static analysis"],
 	"license": ["BSD-3-Clause"],
 	"authors": [
 		{
